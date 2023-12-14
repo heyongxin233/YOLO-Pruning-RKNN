@@ -1,7 +1,9 @@
-# YOLO-Pruning
+# YOLO-Pruning-RKNN
 Easy Training Official YOLOv8、YOLOv7、YOLOv6、YOLOv5、RT-DETR  and Prune all_model using Torch-Pruning!
 
 We implemented YOLOv7 anchor free like YOLOv8！
+
+We replaced the YOLOv8's operations that are not supported by the rknn NPU with operations that can be loaded on the NPU, all without altering the original structure of YOLOv8.
 
 You can use this code like [ultralytics for yolov8](https://github.com/ultralytics/ultralytics) 
 ```
