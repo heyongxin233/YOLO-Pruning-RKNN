@@ -610,8 +610,8 @@ class BaseTrainer:
 
     def resume_training(self, ckpt):
         """Resume YOLO training from given epoch and best fitness."""
-        # if ckpt is None:
-        return
+        if ckpt is None:
+            return
         best_fitness = 0.0
         start_epoch = ckpt['epoch'] + 1
         if ckpt['optimizer'] is not None:
