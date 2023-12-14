@@ -29,7 +29,8 @@ def generate_ddp_file(trainer):
     content = f"""
 # Ultralytics Multi-GPU training temp file (should be automatically deleted after use)
 overrides = {vars(trainer.args)}
-
+import sys
+sys.path.append('./')
 if __name__ == "__main__":
     from {module} import {name}
     from ultralytics.utils import DEFAULT_CFG_DICT
