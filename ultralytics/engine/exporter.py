@@ -92,7 +92,8 @@ def export_formats():
         ['TensorFlow Edge TPU', 'edgetpu', '_edgetpu.tflite', True, False],
         ['TensorFlow.js', 'tfjs', '_web_model', True, False],
         ['PaddlePaddle', 'paddle', '_paddle_model', True, True],
-        ['ncnn', 'ncnn', '_ncnn_model', True, True], ]
+        ['ncnn', 'ncnn', '_ncnn_model', True, True],
+        ['RKNN', 'rknn', '.onnx', True, False], ]
     return pandas.DataFrame(x, columns=['Format', 'Argument', 'Suffix', 'CPU', 'GPU'])
 
 
@@ -163,7 +164,7 @@ class Exporter:
         flags = [x == fmt for x in fmts]
         if sum(flags) != 1:
             raise ValueError(f"Invalid export format='{fmt}'. Valid formats are {fmts}")
-        jit, onnx, xml, engine, coreml, saved_model, pb, tflite, edgetpu, tfjs, paddle, ncnn = flags  # export booleans
+        jit, onnx, xml, engine, coreml, saved_model, pb, tflite, edgetpu, tfjs, paddle, ncnn, rknn = flags  # export booleans
 
         # Device
         if fmt == 'engine' and self.args.device is None:
@@ -273,7 +274,8 @@ class Exporter:
             f[10], _ = self.export_paddle()
         if ncnn:  # ncnn
             f[11], _ = self.export_ncnn()
-
+        if rknn:
+            f[12], _ = self.export_onnx()
         # Finish
         f = [str(x) for x in f if x]  # filter out '' and None
         if any(f):
