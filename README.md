@@ -1,5 +1,5 @@
 # YOLO-Pruning
-Easy Training Official YOLOv8、YOLOv7、YOLOv6、YOLOv5  and Prune all_model using Torch-Pruning!
+Easy Training Official YOLOv8、YOLOv7、YOLOv6、YOLOv5、RT-DETR  and Prune all_model using Torch-Pruning!
 
 We implemented YOLOv7 anchor free like YOLOv5！
 
