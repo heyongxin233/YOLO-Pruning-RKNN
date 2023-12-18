@@ -45,3 +45,14 @@ model = YOLO('yolov8m.yaml')
 results = model.train(data='coco.yaml', epochs=100, imgsz=640, batch=64, device=[0,1,2,3],name='yolov8_pruning',\
                       prune=True,prune_ratio=0.66874,prune_iterative_steps=1)
 ```
+
+### Export
+
+**export example for rknn**
+
+You can see export.py,We support exporting the model to onnx supported by rknn npu.
+```
+from ultralytics import YOLO
+model = YOLO('./yolov8m.pt')
+model.export(format='rknn')
+```
