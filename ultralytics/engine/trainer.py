@@ -88,6 +88,7 @@ class BaseTrainer:
         self.prune=self.args.prune
         self.prune_ratio=self.args.prune_ratio
         self.prune_iterative_steps=self.args.prune_iterative_steps
+        self.prune_load=self.args.prune_load
         # Dirs
         self.save_dir = get_save_dir(self.args)
         self.args.name = self.save_dir.name  # update name for loggers
@@ -207,6 +208,7 @@ class BaseTrainer:
         """Builds dataloaders and optimizer on correct rank process."""
 
         # Model
+        path=self.model
         self.run_callbacks('on_pretrain_routine_start')
         ckpt = self.setup_model()
 
@@ -216,10 +218,10 @@ class BaseTrainer:
             for m in self.model.modules():
                 if isinstance(m, (Detect,)):
                     ignored_layers.append(m)
-            pruner = tp.pruner.GroupNormPruner(
+            pruner = tp.pruner.MagnitudePruner(
                 self.model,
                 example_inputs,
-                importance=tp.importance.GroupNormImportance(),  # L2 norm pruning,
+                importance=tp.importance.MagnitudeImportance(p=2),  # L2 norm pruning,
                 iterative_steps=self.prune_iterative_steps,
                 pruning_ratio=self.prune_ratio,
                 ignored_layers=ignored_layers,
@@ -228,6 +230,10 @@ class BaseTrainer:
             self.model = self.model.to(self.device)
             pruned_macs, pruned_nparams = tp.utils.count_ops_and_params(self.model, example_inputs.to(self.device))
             print(f"After pruning iter : MACs={pruned_macs / 1e9} G, #Params={pruned_nparams / 1e6} M, ")
+
+            if str(path).endswith('.pt') and self.prune_load:
+                weights, _ = attempt_load_one_weight(path)
+                self.model.load(weights)
         else:
             self.model = self.model.to(self.device)
 
@@ -610,8 +616,8 @@ class BaseTrainer:
 
     def resume_training(self, ckpt):
         """Resume YOLO training from given epoch and best fitness."""
-        if ckpt is None:
-            return
+        # if ckpt is None:
+        return
         best_fitness = 0.0
         start_epoch = ckpt['epoch'] + 1
         if ckpt['optimizer'] is not None:
