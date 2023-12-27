@@ -14,6 +14,7 @@ New parameters:
 prune: False(default):(bool) Whether to use torch-pruning 
 prune_ratio: 0.66874(default):(float) Expected model pruning rate
 prune_iterative_steps: 1(default):(int) Number of iteration rounds of pruning
+prune_load: False(default):(bool) Whether to load weights after pruning
 ```
 New model:
 ```
