@@ -331,6 +331,7 @@ class BaseTrainer:
             self.plot_idx.extend([base_idx, base_idx + 1, base_idx + 2])
         epoch = self.epochs  # predefine for resume fully trained model edge cases
         for epoch in range(self.start_epoch, self.epochs):
+            torch.cuda.empty_cache()
             self.epoch = epoch
             self.run_callbacks('on_train_epoch_start')
             self.model.train()
@@ -616,8 +617,8 @@ class BaseTrainer:
 
     def resume_training(self, ckpt):
         """Resume YOLO training from given epoch and best fitness."""
-        # if ckpt is None:
-        return
+        if ckpt is None:
+            return
         best_fitness = 0.0
         start_epoch = ckpt['epoch'] + 1
         if ckpt['optimizer'] is not None:
