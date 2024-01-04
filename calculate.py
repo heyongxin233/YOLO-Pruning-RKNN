@@ -1,8 +1,9 @@
 from ultralytics import YOLO
 from thop import profile
 import torch
+from thop import clever_format
 input1 = torch.randn(1, 3, 480, 640) 
-model = YOLO('/opt/yolov8/runs/detect/yolov8s-leakey-relu-prune3/weights/best.pt')
-flops, params = profile(model.model, inputs=(input1, ))
-print('FLOPs = ' + str(flops/1000**3) + 'G')
-print('Params = ' + str(params/1000**2) + 'M')
+model = YOLO('./yolov8n.pt')
+macs, params = profile(model.model, inputs=(input1, ))
+macs, params = clever_format([macs, params], "%.3f")
+print('macs :',macs, 'params:',params)
