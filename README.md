@@ -57,3 +57,18 @@ from ultralytics import YOLO
 model = YOLO('./yolov8m.pt')
 model.export(format='rknn')
 ```
+
+### Predict
+
+You can predict model like ultralytics.You can see infer.py.More details see the [Predict](https://docs.ultralytics.com/modes/predict/) page
+```
+from ultralytics import YOLO
+model = YOLO('yolov8n.pt') # model = YOLO('prune.pt')
+model.predict('ultralytics/assets/bus.jpg',save=True,device=[0],line_width=2)
+```
+
+### Calculate model parameters
+```
+pip install thop
+```
+You can calculate model parameters and flops by using calculate.py
