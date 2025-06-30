@@ -42,6 +42,10 @@ overlap_mask: True # (bool) merge object masks into a single image mask during t
 mask_ratio: 4 # (int) mask downsample ratio (segment train only)
 # Classification
 dropout: 0.0 # (float) use dropout regularization (classify train only)
+prune: False # Prune or not
+prune_ratio: 0.66874
+prune_iterative_steps: 1
+prune_load: False
 
 # Val/Test settings ----------------------------------------------------------------------------------------------------
 val: True # (bool) validate/test during training

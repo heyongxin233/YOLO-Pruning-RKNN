@@ -15,11 +15,14 @@ import warnings
 from copy import copy, deepcopy
 from datetime import datetime, timedelta
 from pathlib import Path
+from ultralytics.nn.modules import Detect
 
 import numpy as np
 import torch
 from torch import distributed as dist
 from torch import nn, optim
+
+import torch_pruning as tp
 
 from ultralytics import __version__
 from ultralytics.cfg import get_cfg, get_save_dir
@@ -125,6 +128,12 @@ class BaseTrainer:
         self.metrics = None
         self.plots = {}
         init_seeds(self.args.seed + 1 + RANK, deterministic=self.args.deterministic)
+
+        # Prune config 
+        self.prune = self.args.prune
+        self.prune_ratio = self.args.prune_ratio
+        self.prune_iterative_steps = self.args.prune_iterative_steps
+        self.prune_load = self.args.prune_load
 
         # Dirs
         self.save_dir = get_save_dir(self.args)
@@ -250,9 +259,36 @@ class BaseTrainer:
     def _setup_train(self, world_size):
         """Build dataloaders and optimizer on correct rank process."""
         # Model
+        path = self.model
         self.run_callbacks("on_pretrain_routine_start")
         ckpt = self.setup_model()
-        self.model = self.model.to(self.device)
+
+        if self.prune:
+            example_inputs = torch.randn(1, 3, self.args.imgsz, self.args.imgsz)
+            ignored_layers = []
+            for m in self.model.modules():
+                if isinstance(m, (Detect,)):
+                    ignored_layers.append(m)
+            pruner = tp.pruner.MagnitudePruner(
+                self.model,
+                example_inputs,
+                importance = tp.importance.MagnitudeImportance(p=2),  # L2 norm pruning,
+                iterative_steps=self.prune_iterative_steps,
+                pruning_ratio=self.prune_ratio,
+                ignored_layers=ignored_layers,
+            )
+            pruner.step()
+            self.model = self.model.to(self.device)
+            pruned_macs, pruned_nparams = tp.utils.count_ops_and_params(self.model, example_inputs.to(self.device))
+            print(f"After pruning iter : MACs={pruned_macs / 1e9} G, #Params={pruned_nparams / 1e6} M, ")
+
+            if str(path).endswith('.pt') and self.prune_load:
+                weights, _ = attempt_load_one_weight(path)
+                self.model.load(weights)
+        else:
+            self.model = self.model.to(self.device)
+
+
         self.set_model_attributes()
 
         # Freeze layers
