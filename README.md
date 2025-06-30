@@ -1,10 +1,10 @@
 # 🚀 YOLO-Pruning-RKNN 🚀
 
 ## ✨ Key Features
-​- **Super-Efficient Training**: Train state-of-the-art object detection models as easily as using official Ultralytics YOLO ⚡
-​- **Smart Model Pruning**: Use Torch-Pruning to prune models, reducing parameters by up to ​75% without losing accuracy 🎯
-​- **RKNN Export Support**: One-click export to RKNN format for seamless deployment on Rockchip NPU platforms 🚀
-​- **Full-Toolchain Support**: End-to-end workflow covering training, validation, inference, and deployment 🛠️
+- **Super-Efficient Training**: Train state-of-the-art object detection models as easily as using official Ultralytics YOLO ⚡
+- **Smart Model Pruning**: Use Torch-Pruning to prune models, reducing parameters by up to ​75% without losing accuracy 🎯
+- **RKNN Export Support**: One-click export to RKNN format for seamless deployment on Rockchip NPU platforms 🚀
+- **Full-Toolchain Support**: End-to-end workflow covering training, validation, inference, and deployment 🛠️
 
 ## Quickstart
 ### 🔧 Install Dependencies
