@@ -1,5 +1,5 @@
-# Ultralytics YOLO 🚀, AGPL-3.0 license
-"""Base callbacks."""
+# Ultralytics 🚀 AGPL-3.0 License - https://ultralytics.com/license
+"""Base callbacks for Ultralytics training, validation, prediction, and export processes."""
 
 from collections import defaultdict
 from copy import deepcopy
@@ -143,64 +143,79 @@ def on_export_end(exporter):
 
 default_callbacks = {
     # Run in trainer
-    'on_pretrain_routine_start': [on_pretrain_routine_start],
-    'on_pretrain_routine_end': [on_pretrain_routine_end],
-    'on_train_start': [on_train_start],
-    'on_train_epoch_start': [on_train_epoch_start],
-    'on_train_batch_start': [on_train_batch_start],
-    'optimizer_step': [optimizer_step],
-    'on_before_zero_grad': [on_before_zero_grad],
-    'on_train_batch_end': [on_train_batch_end],
-    'on_train_epoch_end': [on_train_epoch_end],
-    'on_fit_epoch_end': [on_fit_epoch_end],  # fit = train + val
-    'on_model_save': [on_model_save],
-    'on_train_end': [on_train_end],
-    'on_params_update': [on_params_update],
-    'teardown': [teardown],
-
+    "on_pretrain_routine_start": [on_pretrain_routine_start],
+    "on_pretrain_routine_end": [on_pretrain_routine_end],
+    "on_train_start": [on_train_start],
+    "on_train_epoch_start": [on_train_epoch_start],
+    "on_train_batch_start": [on_train_batch_start],
+    "optimizer_step": [optimizer_step],
+    "on_before_zero_grad": [on_before_zero_grad],
+    "on_train_batch_end": [on_train_batch_end],
+    "on_train_epoch_end": [on_train_epoch_end],
+    "on_fit_epoch_end": [on_fit_epoch_end],  # fit = train + val
+    "on_model_save": [on_model_save],
+    "on_train_end": [on_train_end],
+    "on_params_update": [on_params_update],
+    "teardown": [teardown],
     # Run in validator
-    'on_val_start': [on_val_start],
-    'on_val_batch_start': [on_val_batch_start],
-    'on_val_batch_end': [on_val_batch_end],
-    'on_val_end': [on_val_end],
-
+    "on_val_start": [on_val_start],
+    "on_val_batch_start": [on_val_batch_start],
+    "on_val_batch_end": [on_val_batch_end],
+    "on_val_end": [on_val_end],
     # Run in predictor
-    'on_predict_start': [on_predict_start],
-    'on_predict_batch_start': [on_predict_batch_start],
-    'on_predict_postprocess_end': [on_predict_postprocess_end],
-    'on_predict_batch_end': [on_predict_batch_end],
-    'on_predict_end': [on_predict_end],
-
+    "on_predict_start": [on_predict_start],
+    "on_predict_batch_start": [on_predict_batch_start],
+    "on_predict_postprocess_end": [on_predict_postprocess_end],
+    "on_predict_batch_end": [on_predict_batch_end],
+    "on_predict_end": [on_predict_end],
     # Run in exporter
-    'on_export_start': [on_export_start],
-    'on_export_end': [on_export_end]}
+    "on_export_start": [on_export_start],
+    "on_export_end": [on_export_end],
+}
 
 
 def get_default_callbacks():
     """
-    Return a copy of the default_callbacks dictionary with lists as default values.
+    Get the default callbacks for Ultralytics training, validation, prediction, and export processes.
 
     Returns:
-        (defaultdict): A defaultdict with keys from default_callbacks and empty lists as default values.
+        (dict): Dictionary of default callbacks for various training events. Each key represents an event during the
+            training process, and the corresponding value is a list of callback functions executed when that event
+            occurs.
+
+    Examples:
+        >>> callbacks = get_default_callbacks()
+        >>> print(list(callbacks.keys()))  # show all available callback events
+        ['on_pretrain_routine_start', 'on_pretrain_routine_end', ...]
     """
     return defaultdict(list, deepcopy(default_callbacks))
 
 
 def add_integration_callbacks(instance):
     """
-    Add integration callbacks from various sources to the instance's callbacks.
+    Add integration callbacks to the instance's callbacks dictionary.
+
+    This function loads and adds various integration callbacks to the provided instance. The specific callbacks added
+    depend on the type of instance provided. All instances receive HUB callbacks, while Trainer instances also receive
+    additional callbacks for various integrations like ClearML, Comet, DVC, MLflow, Neptune, Ray Tune, TensorBoard,
+    and Weights & Biases.
 
     Args:
-        instance (Trainer, Predictor, Validator, Exporter): An object with a 'callbacks' attribute that is a dictionary
-            of callback lists.
-    """
+        instance (Trainer | Predictor | Validator | Exporter): The object instance to which callbacks will be added.
+            The type of instance determines which callbacks are loaded.
 
+    Examples:
+        >>> from ultralytics.engine.trainer import BaseTrainer
+        >>> trainer = BaseTrainer()
+        >>> add_integration_callbacks(trainer)
+    """
     # Load HUB callbacks
     from .hub import callbacks as hub_cb
+
     callbacks_list = [hub_cb]
 
     # Load training callbacks
-    if 'Trainer' in instance.__class__.__name__:
+    if "Trainer" in instance.__class__.__name__:
         from .clearml import callbacks as clear_cb
         from .comet import callbacks as comet_cb
         from .dvc import callbacks as dvc_cb
@@ -209,6 +224,7 @@ def add_integration_callbacks(instance):
         from .raytune import callbacks as tune_cb
         from .tensorboard import callbacks as tb_cb
         from .wb import callbacks as wb_cb
+
         callbacks_list.extend([clear_cb, comet_cb, dvc_cb, mlflow_cb, neptune_cb, tune_cb, tb_cb, wb_cb])
 
     # Add the callbacks to the callbacks dictionary
