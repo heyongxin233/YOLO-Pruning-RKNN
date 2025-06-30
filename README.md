@@ -1,74 +1,90 @@
-# YOLO-Pruning-RKNN
-Easy Training Official YOLOv8、YOLOv7、YOLOv6、YOLOv5、RT-DETR、Prune all_model using Torch-Pruning and Export RKNN Supported models!
+# 🚀 YOLO-Pruning-RKNN 🚀
 
-We implemented YOLOv7 anchor free like YOLOv8！
+## ✨ Key Features
+- **Super-Efficient Training**: Train state-of-the-art object detection models as easily as using official Ultralytics YOLO ⚡
+- **Smart Model Pruning**: Use Torch-Pruning to prune models, reducing parameters by up to ​75% without losing accuracy 🎯
+- **RKNN Export Support**: One-click export to RKNN format for seamless deployment on Rockchip NPU platforms 🚀
+- **Full-Toolchain Support**: End-to-end workflow covering training, validation, inference, and deployment 🛠️
 
-We replaced the YOLOv8's operations that are not supported by the rknn NPU with operations that can be loaded on the NPU, all **without altering the original structure of YOLOv8**.
-
-We implemented pruning of the YOLO model using **torch-pruning**.
-
-You can reduce the number of parameters by **75%** without losing any accuracy!
-
-New parameters:
-```
-prune: False(default):(bool) Whether to use torch-pruning 
-prune_ratio: 0.66874(default):(float) Expected model pruning rate
-prune_iterative_steps: 1(default):(int) Number of iteration rounds of pruning
-prune_load: False(default):(bool) Whether to load weights after pruning
-```
-New model:
-```
-yolov7.yaml
-```
-
-You can use this code like [ultralytics for yolov8](https://github.com/ultralytics/ultralytics) ，and see the [YOLOv8 Docs](https://docs.ultralytics.com/) for full documentation on training, validation, prediction and deployment.
-### Quickstart
-```
+## Quickstart
+### 🔧 Install Dependencies
+```bash
 pip install torch-pruning 
 pip install -r requirements.txt
 ```
-### Train and prune
-
-**training example for yolov7**
-
-You can see train.py
-```
+## 🚂 Training & Pruning
+### 📊 YOLO11 Training Example
+```python
 from ultralytics import YOLO
-model = YOLO('yolov7m.yaml')
-results = model.train(data='coco.yaml', epochs=100, imgsz=640, batch=64, device=[0,1,2,3],name='yolov7')
-```
-**pruning example for yolov8m**
 
-You can see prune.py
+# Create and train a model
+model = YOLO('yolo11.yaml')
+results = model.train(
+    data='coco.yaml',         # Dataset config file
+    epochs=100,               # Number of training epochs
+    imgsz=640,                # Image size
+    batch=16,                 # Batch size
+    device=[0,1,2,3],         # Use GPUs 0-3
+    name='yolo11'             # Experiment name
+)
 ```
+### ✂️ YOLO11 Pruning Example
+
+```python
 from ultralytics import YOLO
-model = YOLO('yolov8m.yaml')
-results = model.train(data='coco.yaml', epochs=100, imgsz=640, batch=64, device=[0,1,2,3],name='yolov8_pruning',\
-                      prune=True,prune_ratio=0.66874,prune_iterative_steps=1)
+
+# Create and prune a model (parameters are customizable)
+model = YOLO('yolo11.yaml')
+results = model.train(
+    data='coco.yaml',
+    epochs=100,
+    imgsz=640,
+    batch=64,
+    device=[0,1,2,3],
+    name='yolov8_pruning',
+    prune=True,               # Enable pruning
+    prune_ratio=0.5,          # Pruning ratio (50%)
+    prune_iterative_steps=1   # Iterative pruning steps
+)
 ```
 
-### Export
+## 📤 Model Export
 
-**export example for rknn**
-
-You can see export.py,We support exporting the model to onnx supported by rknn npu.
-```
+### Export to RKNN Format
+```python
 from ultralytics import YOLO
-model = YOLO('./yolov8m.pt')
+
+# Load a trained model
+model = YOLO('yolo11.pt')
+
+# Export to RKNN format
 model.export(format='rknn')
 ```
 
-### Predict
+### 🔮 Model Inference
 
-You can predict model like ultralytics.You can see infer.py.More details see the [Predict](https://docs.ultralytics.com/modes/predict/) page
-```
+More details about [predict](https://docs.ultralytics.com/modes/predict/).
+```python
 from ultralytics import YOLO
-model = YOLO('yolov8n.pt') # model = YOLO('prune.pt')
-model.predict('ultralytics/assets/bus.jpg',save=True,device=[0],line_width=2)
+
+# Load a model (original or pruned)
+model = YOLO('yolo11.pt')  # or model = YOLO('pruned.pt')
+
+# Run inference
+model.predict(
+    'ultralytics/assets/bus.jpg',  # Input image path
+    save=True,                     # Save results
+    device=[0],                    # Use GPU 0
+    line_width=2                   # Detection box line width
+)
 ```
 
-### Calculate model parameters
-```
+## 🔢 Model Analysis
+Use `thop` to easily calculate model parameters and FLOPs:
+```bash
 pip install thop
 ```
 You can calculate model parameters and flops by using calculate.py
+
+## 🤝 Contributing & Support
+Feel free to submit issues or pull requests on GitHub for questions or suggestions!
