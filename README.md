@@ -30,22 +30,41 @@ results = model.train(
 ```
 ### ✂️ YOLO11 Pruning Example
 
-```python
-from ultralytics import YOLO
+#### Quick Purning
 
-# Create and prune a model (parameters are customizable)
-model = YOLO('yolo11.yaml')
-results = model.train(
-    data='coco.yaml',
-    epochs=100,
-    imgsz=640,
-    batch=64,
-    device=[0,1,2,3],
-    name='yolov8_pruning',
-    prune=True,               # Enable pruning
-    prune_ratio=0.5,          # Pruning ratio (50%)
-    prune_iterative_steps=1   # Iterative pruning steps
-)
+Directly pruning and training pre-trained models generally results in lower accuracy and larger models. See `prune.py` for details.
+
+```python
+prunetrain(quick_pruning=True,        # Quick Pruning or not
+           data='coco.yaml',          # Dataset config
+           train_epochs=10,           # Epochs before pruning
+           imgsz=640,                 # Input size
+           batch=8,                   # Batch size
+           device=[0],                # GPU devices
+           name='yolo11',             # Save name
+           prune_ratio=0.5,           # Pruning Ratio (50%)
+           prune_iterative_steps=1)   # Pruning Interative Steps
+```
+
+#### Normal Purning
+
+According to the author of torch pruning, first train, then prune, and retrain after pruning.
+
+In normal pruning mode, the `prune_epochs` parameter is mandatory, representing the number of training epochs after pruning. 
+
+See `prune.py` for details.
+
+```python
+prunetrain(quick_pruning=False,       # Quick Pruning or not
+           data='coco.yaml',          # Dataset config
+           train_epochs=10,           # Epochs before pruning
+           prune_epochs=10,           # Epochs after pruning 
+           imgsz=640,                 # Input size
+           batch=8,                   # Batch size
+           device=[0],                # GPU devices
+           name='yolo11',             # Save name
+           prune_ratio=0.5,           # Pruning Ratio (50%)
+           prune_iterative_steps=1)   # Pruning Interative Steps
 ```
 
 ## 📤 Model Export
