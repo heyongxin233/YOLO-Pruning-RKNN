@@ -9,6 +9,7 @@ import torch
 import torch.nn as nn
 
 __all__ = (
+    "MP"
     "Conv",
     "Conv2",
     "LightConv",
@@ -34,6 +35,13 @@ def autopad(k, p=None, d=1):  # kernel, padding, dilation
         p = k // 2 if isinstance(k, int) else [x // 2 for x in k]  # auto-pad
     return p
 
+class MP(nn.Module):
+    def __init__(self, k=2):
+        super(MP, self).__init__()
+        self.m = nn.MaxPool2d(kernel_size=k, stride=k)
+
+    def forward(self, x):
+        return self.m(x)
 
 class Conv(nn.Module):
     """
