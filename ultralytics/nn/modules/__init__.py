@@ -18,6 +18,7 @@ Examples:
 """
 
 from .block import (
+    SPPCSPC,
     C1,
     C2,
     C2PSA,
@@ -61,6 +62,7 @@ from .block import (
     TorchVision,
 )
 from .conv import (
+    MP, 
     CBAM,
     ChannelAttention,
     Concat,
@@ -103,6 +105,8 @@ from .transformer import (
 )
 
 __all__ = (
+    "MP",
+    "SPPCSPC",
     "Conv",
     "Conv2",
     "LightConv",

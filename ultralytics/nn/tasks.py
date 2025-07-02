@@ -12,6 +12,8 @@ import torch.nn as nn
 
 from ultralytics.nn.autobackend import check_class_names
 from ultralytics.nn.modules import (
+    MP,
+    SPPCSPC,
     AIFI,
     C1,
     C2,
@@ -1607,6 +1609,8 @@ def parse_model(d, ch, verbose=True):
     layers, save, c2 = [], [], ch[-1]  # layers, savelist, ch out
     base_modules = frozenset(
         {
+            RepConv,
+            SPPCSPC,
             Classify,
             Conv,
             ConvTranspose,
