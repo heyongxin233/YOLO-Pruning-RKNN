@@ -184,6 +184,9 @@ class BaseTrainer:
         if RANK in {-1, 0}:
             callbacks.add_integration_callbacks(self)
 
+        # Pruner
+        self.pruner = None
+
     def add_callback(self, event: str, callback):
         """Append the given callback to the event's callback list."""
         self.callbacks[event].append(callback)
@@ -263,21 +266,22 @@ class BaseTrainer:
         self.run_callbacks("on_pretrain_routine_start")
         ckpt = self.setup_model()
 
+        example_inputs = torch.randn(1, 3, self.args.imgsz, self.args.imgsz)
+        ignored_layers = []
+        for m in self.model.modules():
+            if isinstance(m, (Detect, Attention, )):
+                ignored_layers.append(m)
+        self.pruner = tp.pruner.MagnitudePruner(
+            self.model,
+            example_inputs,
+            importance = tp.importance.MagnitudeImportance(p=2),  # L2 norm pruning,
+            iterative_steps=self.prune_iterative_steps,
+            pruning_ratio=self.prune_ratio,
+            ignored_layers=ignored_layers,
+        )
+
         if self.prune:
-            example_inputs = torch.randn(1, 3, self.args.imgsz, self.args.imgsz)
-            ignored_layers = []
-            for m in self.model.modules():
-                if isinstance(m, (Detect, Attention, )):
-                    ignored_layers.append(m)
-            pruner = tp.pruner.MagnitudePruner(
-                self.model,
-                example_inputs,
-                importance = tp.importance.MagnitudeImportance(p=2),  # L2 norm pruning,
-                iterative_steps=self.prune_iterative_steps,
-                pruning_ratio=self.prune_ratio,
-                ignored_layers=ignored_layers,
-            )
-            pruner.step()
+            self.pruner.step()
             self.model = self.model.to(self.device)
             pruned_macs, pruned_nparams = tp.utils.count_ops_and_params(self.model, example_inputs.to(self.device))
             print(f"After pruning iter : MACs={pruned_macs / 1e9} G, #Params={pruned_nparams / 1e6} M, ")
