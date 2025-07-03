@@ -283,6 +283,7 @@ class BaseTrainer:
             )
 
         if self.prune:
+            example_inputs = torch.randn(1, 3, self.args.imgsz, self.args.imgsz)
             self.pruner.step()
             self.model = self.model.to(self.device)
             pruned_macs, pruned_nparams = tp.utils.count_ops_and_params(self.model, example_inputs.to(self.device))
@@ -459,7 +460,7 @@ class BaseTrainer:
                 self.scaler.scale(self.loss).backward()
 
                 if self.sparse_training:
-                    self.pruner.regularize() # After loss.backward(), Before optimizer.step()
+                    self.pruner.regularize(self.model, self.loss) # After loss.backward(), Before optimizer.step()
 
                 # Optimize - https://pytorch.org/docs/master/notes/amp_examples.html
                 if ni - last_opt_step >= self.accumulate:

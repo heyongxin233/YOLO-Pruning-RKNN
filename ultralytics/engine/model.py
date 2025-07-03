@@ -796,6 +796,9 @@ class Model(torch.nn.Module):
             self.model = self.trainer.model
 
         self.trainer.hub_session = self.session  # attach optional HUB session
+        self.trainer.prune = kwargs.get("prune", False)
+        self.trainer.prune_ratio = kwargs.get("prune_ratio", 0.5)
+        self.trainer.prune_iterative_steps = kwargs.get("prune_iterative_steps", 1)
         self.trainer.train()
         # Update model and cfg after training
         if RANK in {-1, 0}:
