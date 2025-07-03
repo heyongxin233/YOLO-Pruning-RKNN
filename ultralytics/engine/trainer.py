@@ -267,19 +267,20 @@ class BaseTrainer:
         self.run_callbacks("on_pretrain_routine_start")
         ckpt = self.setup_model()
 
-        example_inputs = torch.randn(1, 3, self.args.imgsz, self.args.imgsz)
-        ignored_layers = []
-        for m in self.model.modules():
-            if isinstance(m, (Detect, Attention, )):
-                ignored_layers.append(m)
-        self.pruner = tp.pruner.MagnitudePruner(
-            self.model,
-            example_inputs,
-            importance = tp.importance.MagnitudeImportance(p=2),  # L2 norm pruning,
-            iterative_steps=self.prune_iterative_steps,
-            pruning_ratio=self.prune_ratio,
-            ignored_layers=ignored_layers,
-        )
+        if self.pruner is None:
+            example_inputs = torch.randn(1, 3, self.args.imgsz, self.args.imgsz)
+            ignored_layers = []
+            for m in self.model.modules():
+                if isinstance(m, (Detect, Attention, )):
+                    ignored_layers.append(m)
+            self.pruner = tp.pruner.MagnitudePruner(
+                self.model,
+                example_inputs,
+                importance = tp.importance.MagnitudeImportance(p=2),  # L2 norm pruning,
+                iterative_steps=self.prune_iterative_steps,
+                pruning_ratio=self.prune_ratio,
+                ignored_layers=ignored_layers,
+            )
 
         if self.prune:
             self.pruner.step()
