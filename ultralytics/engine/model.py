@@ -150,6 +150,9 @@ class Model(torch.nn.Module):
         else:
             self._load(model, task=task)
 
+        # Pruner
+        self.pruner = None
+
         # Delete super().training for accessing self.model.training
         del self.training
 
