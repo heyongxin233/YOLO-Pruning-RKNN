@@ -26,8 +26,8 @@ prunetrain(quick_pruning=False,       # Quick Pruning or not
            name='yolo11',             # Save name
            prune_ratio=0.5,           # Pruning Ratio (50%)
            prune_iterative_steps=1,   # Pruning Interative Steps
-           sparse_training=False)     # Experimental, Allow Sparse Training Before Pruning
-
+           sparse_training=False      # Experimental, Allow Sparse Training Before Pruning
+)
 # Quick Pruning (prune_epochs no need)
 # prunetrain(quick_pruning=True, data='coco.yaml', train_epochs=10, imgsz=640, batch=8, device=[0], name='yolo11', 
 #            prune_ratio=0.5, prune_iterative_steps=1)
