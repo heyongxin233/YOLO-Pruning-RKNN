@@ -1,7 +1,4 @@
 from ultralytics import YOLO
-import torch_pruning as tp
-from ultralytics.nn.modules import Detect, Attention
-import torch
 
 model = YOLO('yolo11.yaml')
 
