@@ -134,6 +134,7 @@ class BaseTrainer:
         self.prune_ratio = self.args.prune_ratio
         self.prune_iterative_steps = self.args.prune_iterative_steps
         self.prune_load = self.args.prune_load
+        self.sparse_training = self.args.sparse_training
 
         # Dirs
         self.save_dir = get_save_dir(self.args)
@@ -183,6 +184,9 @@ class BaseTrainer:
         self.callbacks = _callbacks or callbacks.get_default_callbacks()
         if RANK in {-1, 0}:
             callbacks.add_integration_callbacks(self)
+
+        # Pruner
+        self.pruner = None
 
     def add_callback(self, event: str, callback):
         """Append the given callback to the event's callback list."""
@@ -263,13 +267,13 @@ class BaseTrainer:
         self.run_callbacks("on_pretrain_routine_start")
         ckpt = self.setup_model()
 
-        if self.prune:
+        if self.pruner is None:
             example_inputs = torch.randn(1, 3, self.args.imgsz, self.args.imgsz)
             ignored_layers = []
             for m in self.model.modules():
                 if isinstance(m, (Detect, Attention, )):
                     ignored_layers.append(m)
-            pruner = tp.pruner.MagnitudePruner(
+            self.pruner = tp.pruner.MagnitudePruner(
                 self.model,
                 example_inputs,
                 importance = tp.importance.MagnitudeImportance(p=2),  # L2 norm pruning,
@@ -277,7 +281,10 @@ class BaseTrainer:
                 pruning_ratio=self.prune_ratio,
                 ignored_layers=ignored_layers,
             )
-            pruner.step()
+
+        if self.prune:
+            example_inputs = torch.randn(1, 3, self.args.imgsz, self.args.imgsz)
+            self.pruner.step()
             self.model = self.model.to(self.device)
             pruned_macs, pruned_nparams = tp.utils.count_ops_and_params(self.model, example_inputs.to(self.device))
             print(f"After pruning iter : MACs={pruned_macs / 1e9} G, #Params={pruned_nparams / 1e6} M, ")
@@ -421,6 +428,8 @@ class BaseTrainer:
                 LOGGER.info(self.progress_string())
                 pbar = TQDM(enumerate(self.train_loader), total=nb)
             self.tloss = None
+            if self.sparse_training:
+                self.pruner.update_regularizer() # Init every epoch
             for i, batch in pbar:
                 self.run_callbacks("on_train_batch_start")
                 # Warmup
@@ -449,6 +458,9 @@ class BaseTrainer:
 
                 # Backward
                 self.scaler.scale(self.loss).backward()
+
+                if self.sparse_training:
+                    self.pruner.regularize(self.model, self.loss) # After loss.backward(), Before optimizer.step()
 
                 # Optimize - https://pytorch.org/docs/master/notes/amp_examples.html
                 if ni - last_opt_step >= self.accumulate:

@@ -789,13 +789,16 @@ class Model(torch.nn.Module):
         args = {**overrides, **custom, **kwargs, "mode": "train"}  # highest priority args on the right
         if args.get("resume"):
             args["resume"] = self.ckpt_path
-
-        self.trainer = (trainer or self._smart_load("trainer"))(overrides=args, _callbacks=self.callbacks)
+        if self.trainer is None:
+            self.trainer = (trainer or self._smart_load("trainer"))(overrides=args, _callbacks=self.callbacks)
         if not args.get("resume"):  # manually set model only if not resuming
             self.trainer.model = self.trainer.get_model(weights=self.model if self.ckpt else None, cfg=self.model.yaml)
             self.model = self.trainer.model
 
         self.trainer.hub_session = self.session  # attach optional HUB session
+        self.trainer.prune = kwargs.get("prune", False)
+        self.trainer.prune_ratio = kwargs.get("prune_ratio", 0.5)
+        self.trainer.prune_iterative_steps = kwargs.get("prune_iterative_steps", 1)
         self.trainer.train()
         # Update model and cfg after training
         if RANK in {-1, 0}:

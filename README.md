@@ -43,7 +43,8 @@ prunetrain(quick_pruning=True,        # Quick Pruning or not
            device=[0],                # GPU devices
            name='yolo11',             # Save name
            prune_ratio=0.5,           # Pruning Ratio (50%)
-           prune_iterative_steps=1)   # Pruning Interative Steps
+           prune_iterative_steps=1    # Pruning Interative Steps
+)
 ```
 
 #### Normal Purning
@@ -64,8 +65,12 @@ prunetrain(quick_pruning=False,       # Quick Pruning or not
            device=[0],                # GPU devices
            name='yolo11',             # Save name
            prune_ratio=0.5,           # Pruning Ratio (50%)
-           prune_iterative_steps=1)   # Pruning Interative Steps
+           prune_iterative_steps=1,   # Pruning Interative Steps
+           sparse_training=False      # Experimental, Allow Sparse Training Before Pruning
+)
 ```
+
+Please note that the `sparse_training` parameter is experimental, and setting it to `True` may result in **better or worse** performance.
 
 ## 📤 Model Export
 
@@ -107,3 +112,9 @@ You can calculate model parameters and flops by using calculate.py
 
 ## 🤝 Contributing & Support
 Feel free to submit issues or pull requests on GitHub for questions or suggestions!
+
+## 📚 Acknowledgements
+
+- Special thanks to [@VainF](https://github.com/VainF) for their contribution to the [Torch-Pruning](https://github.com/VainF/Torch-Pruning) project! This project relies on it for model pruning.
+
+- Special thanks to [@Ultralytics](https://github.com/ultralytics) for their contribution to the [ultralytics](https://github.com/ultralytics/ultralytics) project! This project relies on it for the framework.
