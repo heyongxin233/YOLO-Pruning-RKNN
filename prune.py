@@ -7,7 +7,8 @@ def prunetrain(train_epochs, prune_epochs=0, quick_pruning=True, prune_ratio=0.5
                batch=8, device=[0], sparse_training=False):
     if not quick_pruning:
         assert train_epochs > 0 and prune_epochs > 0, "Quick Pruning is not set. prune epochs must > 0."
-        model.train(data=data, epochs=train_epochs, imgsz=imgsz, batch=batch, device=device, name=name, prune=False)
+        model.train(data=data, epochs=train_epochs, imgsz=imgsz, batch=batch, device=device, name=name, prune=False,
+                    sparse_training=sparse_training)
         return model.train(data=data, epochs=prune_epochs, imgsz=imgsz, batch=batch, device=device, name=name, prune=True,
                            prune_ratio=prune_ratio, prune_iterative_steps=prune_iterative_steps)
     else:

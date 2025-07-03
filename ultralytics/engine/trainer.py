@@ -134,6 +134,7 @@ class BaseTrainer:
         self.prune_ratio = self.args.prune_ratio
         self.prune_iterative_steps = self.args.prune_iterative_steps
         self.prune_load = self.args.prune_load
+        self.sparse_training = self.args.sparse_training
 
         # Dirs
         self.save_dir = get_save_dir(self.args)

@@ -46,6 +46,7 @@ prune: False # Prune or not
 prune_ratio: 0.66874
 prune_iterative_steps: 1
 prune_load: False
+sparse_training: False
 
 # Val/Test settings ----------------------------------------------------------------------------------------------------
 val: True # (bool) validate/test during training
