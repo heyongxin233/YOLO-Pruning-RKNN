@@ -116,6 +116,6 @@ Feel free to submit issues or pull requests on GitHub for questions or suggestio
 
 ## 📚 Acknowledgements
 
-- Special thanks to [@VainF](https://github.com/VainF) for their contribution to the [Torch-Pruning](https://github.com/VainF/Torch-Pruning) project! This project relies on it for model pruning.
+- Special thanks to [@VainF](https://github.com/VainF) for the contribution to the [Torch-Pruning](https://github.com/VainF/Torch-Pruning) project! This project relies on it for model pruning.
 
-- Special thanks to [@Ultralytics](https://github.com/ultralytics) for their contribution to the [ultralytics](https://github.com/ultralytics/ultralytics) project! This project relies on it for the framework.
+- Special thanks to [@Ultralytics](https://github.com/ultralytics) for the contribution to the [ultralytics](https://github.com/ultralytics/ultralytics) project! This project relies on it for the framework.
