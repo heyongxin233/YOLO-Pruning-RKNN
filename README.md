@@ -5,6 +5,7 @@
 - **Smart Model Pruning**: Use Torch-Pruning to prune models, reducing parameters by up to ​75% without losing accuracy 🎯
 - **RKNN Export Support**: One-click export to RKNN format for seamless deployment on Rockchip NPU platforms 🚀
 - **Full-Toolchain Support**: End-to-end workflow covering training, validation, inference, and deployment 🛠️
+- **Full-Model support**: Fully supports pruning for almost all versions of YOLO models, from YOLOv3 to the latest YOLOv12 🌍
 
 ## Quickstart
 ### 🔧 Install Dependencies
