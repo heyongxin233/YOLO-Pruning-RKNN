@@ -43,6 +43,7 @@ def export_onnx(
         input_names=input_names,
         output_names=output_names,
         dynamic_axes=dynamic or None,
+        dynamo=False,
     )
 
 
